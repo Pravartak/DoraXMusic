@@ -7,7 +7,7 @@ api_id = 16519771
 api_hash ="83754b17b54fe9d6a602e70c458afddb"
 chat_id = -1001600386203
 async def main():
-    async with Client("my_account", api_id, api_hash) as bot:
+async with Client("my_account", api_id, api_hash) as bot:
 app = PyTgCalls(bot)
 app.start()
 app.join_group_call(
