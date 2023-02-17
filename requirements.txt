@@ -1,0 +1,5 @@
+py-tgcalls
+pyrogram
+requests
+frozenlist
+python-telegram-bot
