@@ -10,13 +10,12 @@ chat_id = -1001600386203
     
 async def main():
     async with Client("my_account", api_id, api_hash) as bot:
-
-app = PyTgCalls(bot)
+      app = PyTgCalls(bot)
 app.start()
 app.join_group_call(
-   chat_id,
-   AudioPiped(
-       'http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4',
+chat_id,
+  AudioPiped(
+      'http://docs.evostream.com/sample_content/assets/sintel1m720p.mp4',
    )
 )
 idle()
