@@ -1,4 +1,4 @@
-from TgCallBot import config
+from DJAdam import config
 from pyrogram import Client
 from pytgcalls import PyTgCalls
 from pytgcalls import idle
