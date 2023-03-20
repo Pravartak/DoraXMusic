@@ -1,3 +1,4 @@
+python-telegram-bot
 pyrogram
 tgcrypto
 pip==23.0.1
