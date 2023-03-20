@@ -2,3 +2,11 @@ python-telegram-bot
 pyrogram
 tgcrypto
 pip==23.0.1
+aiofiles
+aiohttp
+requests
+wget
+yt-dlp
+py-tgcalls
+youtube-search
+youtube-search-python
