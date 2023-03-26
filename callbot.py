@@ -11,6 +11,7 @@ from telegram.ext import (
 )
 from typing import Optional, Tuple
 from pyrogram import Client, filters
+import config
 
 bot = Client(
           "DJ Adam",
