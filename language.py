@@ -27,7 +27,6 @@ def language(mystic):
 def languageCB(mystic):
     async def wrapper(_, CallbackQuery, **kwargs):
         if await is_maintenance() is False:
-            if CallbackQuery.from_user.id not in SUDOERS:
                 return await CallbackQuery.answer(
                     "Bot is under maintenance. Please wait for some time...",
                     show_alert=True,
