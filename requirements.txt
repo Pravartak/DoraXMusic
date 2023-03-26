@@ -6,6 +6,7 @@ aiofiles
 aiohttp
 requests
 wget
+python-dotenv
 yt-dlp
 py-tgcalls
 youtube-search
