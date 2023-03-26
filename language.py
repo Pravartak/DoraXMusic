@@ -1,5 +1,4 @@
 from __init__ import get_string
-from misc import SUDOERS
 from database import (get_lang, is_commanddelete_on,
                                        is_maintenance)
 
@@ -7,7 +6,6 @@ from database import (get_lang, is_commanddelete_on,
 def language(mystic):
     async def wrapper(_, message, **kwargs):
         if await is_maintenance() is False:
-            if message.from_user.id not in SUDOERS:
                 return await message.reply_text(
                     "Bot is under maintenance. Please wait for some time..."
                 )
