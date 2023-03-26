@@ -14,9 +14,9 @@ from pyrogram import Client, filters
 
 bot = Client(
           "DJ Adam",
-          api_id = 16519771,
-          api_hash = "83754b17b54fe9d6a602e70c458afddb",
-          bot_token = "6165241065:AAHPgX6HbVbu2fceDToVKFwAa9g1aFs_6Z4"
+          api_id=config.API_ID,
+          api_hash=config.API_HASH,
+          bot_token=config.BOT_TOKEN,
 )
 
 @bot.on_message(filters.command('start')) #Creating a command.
