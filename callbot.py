@@ -184,7 +184,7 @@ from pyrogram.types import (InlineKeyboardButton,
 from config import (BANNED_USERS, SONG_DOWNLOAD_DURATION,
 SONG_DOWNLOAD_DURATION_LIMIT)
 from Youtube import YouTubeAPI
-#from language import language, languageCB
+from language import language, languageCB
 from formatters import convert_bytes
 from song import song_markup
 
@@ -199,7 +199,7 @@ SONG_COMMAND=('song', 'video')
 )
 @bot.on_edited_message(filters.command(SONG_COMMAND)
 )
-#@language
+@language
 async def song_command_group(client, message: Message, _):
     upl = InlineKeyboardMarkup(
         [
