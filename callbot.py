@@ -17,7 +17,7 @@ bot = Client(
           "DJ Adam",
           api_id=config.API_ID,
           api_hash=config.API_HASH,
-          bot_token=config.BOT_TOKEN,
+          bot_token=config.BOT_TOKEN
 )
 
 @bot.on_message(filters.command('start')) #Creating a command.
@@ -166,10 +166,6 @@ def command8(Client, message):
 def command9(Client, message):
      bot.send_video(message.chat.id, "BAACAgUAAxkBAAIBjGQUMpjZncQRUimRznI5W_o7q0jEAALxCAACTwABiFT8ZIeEsarF0x4E")
 
-#@bot.on_message(filters.text)
-#def delete_text(bot, message):
-#     bot.delete_messages(message.chat.id, message_id)
-
 #———————Song Module———————#
 
 import os
@@ -185,12 +181,15 @@ from pyrogram.types import (InlineKeyboardButton,
 from config import (BANNED_USERS, SONG_DOWNLOAD_DURATION,
 SONG_DOWNLOAD_DURATION_LIMIT)
 from Youtube import YouTubeAPI
-from language import language, languageCB
 from formatters import convert_bytes
 from song import song_markup
+from pytgcalls import PyTgCalls
+#from pytgcalls import ffprobe
+
+YouTube = YouTubeAPI()
 
 # Command
-SONG_COMMAND=('song', 'video')
+SONG_COMMAND=("song|video")
 
 
 @bot.on_message(
@@ -200,19 +199,19 @@ SONG_COMMAND=('song', 'video')
 )
 @bot.on_edited_message(filters.command(SONG_COMMAND)
 )
-@language
-async def song_command_group(client, message: Message, _):
+
+async def song_command_group(client, message: Message):
     upl = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
-                    text=_["↗️ Open Private Chat"],
-                    url=f"https://t.me/{app.username}?start=song",
+                    text="↗️ Open Private Chat",
+                    url=f"https://t.me/Unique_Adam_Bot?start=song",
                 ),
             ]
         ]
     )
-    await message.reply_text(_["You can download Music or Video from YouTube only in private chat. Please start me in private chat."], reply_markup=upl)
+    await message.reply_text("You can download Music or Video from YouTube only in private chat. Please start me in private chat.", reply_markup=upl)
 
 
 # Song Module
@@ -225,14 +224,14 @@ async def song_command_group(client, message: Message, _):
 )
 @bot.on_edited_message(filters.command(SONG_COMMAND)
 )
-@language
-async def song_command_private(client, message: Message, _):
+
+async def song_command_private(client, message: Message):
     await message.delete()
     url = await YouTube.url(message)
     if url:
         if not await YouTube.exists(url):
-            return await message.reply_text(_["song_5"])
-        mystic = await message.reply_text(_["play_1"])
+            return await message.reply_text("Not a valid Youtube Link")
+        mystic = await message.reply_text("🔄 Processing Query... Please Wait!")
         (
             title,
             duration_min,
@@ -241,24 +240,24 @@ async def song_command_private(client, message: Message, _):
             vidid,
         ) = await YouTube.details(url)
         if str(duration_min) == "None":
-            return await mystic.edit_text(_["song_3"])
+            return await mystic.edit_text("Live Link Detected. I am not able to download live youtube videos.")
         if int(duration_sec) > SONG_DOWNLOAD_DURATION_LIMIT:
             return await mystic.edit_text(
-                _["play_4"].format(
+                "🖇 **Admins Only Play**\nOnly Admins and Auth Users can play music in this group.\n\nChange mode via /playmode and if you're already admin, reload admincache via /admincache".format(
                     SONG_DOWNLOAD_DURATION, duration_min
                 )
             )
-        buttons = song_markup(_, vidid)
+        buttons = song_markup(vidid)
         await mystic.delete()
         return await message.reply_photo(
             thumbnail,
-            caption=_["song_4"].format(title),
+            caption="**🔗Title:**- {0}\n\nSelect the type in which you want to download.".format(title),
             reply_markup=InlineKeyboardMarkup(buttons),
         )
     else:
         if len(message.command) < 2:
-            return await message.reply_text(_["song_2"])
-    mystic = await message.reply_text(_["play_1"])
+            return await message.reply_text("**Usage:**\n\n/song [Music Name] or [Youtube Link]")
+    mystic = await message.reply_text("🔄 Processing Query... Please Wait!")
     query = message.text.split(None, 1)[1]
     try:
         (
@@ -269,31 +268,30 @@ async def song_command_private(client, message: Message, _):
             vidid,
         ) = await YouTube.details(query)
     except:
-        return await mystic.edit_text(_["play_3"])
+        return await mystic.edit_text("Failed to Process Query!")
     if str(duration_min) == "None":
-        return await mystic.edit_text(_["song_3"])
+        return await mystic.edit_text("Live Link Detected. I am not able to download live youtube videos.")
     if int(duration_sec) > SONG_DOWNLOAD_DURATION_LIMIT:
         return await mystic.edit_text(
-            _["play_6"].format(SONG_DOWNLOAD_DURATION, duration_min)
+            "**Duration Limit Exceeded**\n\n**Allowed Duration: **{0} minute(s)\n**Received Duration:** {1} hour(s)".format(SONG_DOWNLOAD_DURATION, duration_min)
         )
-    buttons = song_markup(_, vidid)
+    buttons = song_markup(vidid)
     await mystic.delete()
     return await message.reply_photo(
         thumbnail,
-        caption=_["song_4"].format(title),
-        reply_markup=InlineKeyboardMarkup(buttons),
+        caption="**🔗Title:**- {0}\n\nSelect the type in which you want to download.".format(title),
+        reply_markup=InlineKeyboardMarkup(buttons)
     )
 
 
 @bot.on_callback_query(
     filters.regex(pattern=r"song_back") & ~BANNED_USERS
 )
-@languageCB
-async def songs_back_helper(client, CallbackQuery, _):
+async def songs_back_helper(client, CallbackQuery):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
     stype, vidid = callback_request.split("|")
-    buttons = song_markup(_, vidid)
+    buttons = song_markup(vidid)
     return await CallbackQuery.edit_message_reply_markup(
         reply_markup=InlineKeyboardMarkup(buttons)
     )
@@ -302,13 +300,13 @@ async def songs_back_helper(client, CallbackQuery, _):
 @bot.on_callback_query(
     filters.regex(pattern=r"song_helper") & ~BANNED_USERS
 )
-@languageCB
-async def song_helper_cb(client, CallbackQuery, _):
+#@languageCB
+async def song_helper_cb(client, CallbackQuery):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
     stype, vidid = callback_request.split("|")
     try:
-        await CallbackQuery.answer(_["song_6"], show_alert=True)
+        await CallbackQuery.answer("Getting Formats.. \n\nPlease Wait..", show_alert=True)
     except:
         pass
     if stype == "audio":
@@ -317,7 +315,7 @@ async def song_helper_cb(client, CallbackQuery, _):
                 vidid, True
             )
         except:
-            return await CallbackQuery.edit_message_text(_["song_7"])
+            return await CallbackQuery.edit_message_text("Failed to get available formats for the video. Please try any other track.")
         keyboard = InlineKeyboard()
         done = []
         for x in formats_available:
@@ -340,11 +338,11 @@ async def song_helper_cb(client, CallbackQuery, _):
                 )
         keyboard.row(
             InlineKeyboardButton(
-                text=_["BACK_BUTTON"],
+                text="⬅ Back",
                 callback_data=f"song_back {stype}|{vidid}",
             ),
             InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"], callback_data=f"close"
+                text="🗑 Close", callback_data=f"close"
             ),
         )
         return await CallbackQuery.edit_message_reply_markup(
@@ -357,7 +355,7 @@ async def song_helper_cb(client, CallbackQuery, _):
             )
         except Exception as e:
             print(e)
-            return await CallbackQuery.edit_message_text(_["song_7"])
+            return await CallbackQuery.edit_message_text("Failed to get available formats for the video. Please try any other track.")
         keyboard = InlineKeyboard()
         # AVC Formats Only [ Unique Adam Bot ]
         done = [160, 133, 134, 135, 136, 137, 298, 299, 264, 304, 266]
@@ -378,11 +376,11 @@ async def song_helper_cb(client, CallbackQuery, _):
             )
         keyboard.row(
             InlineKeyboardButton(
-                text=_["BACK_BUTTON"],
+                text="⬅ Back",
                 callback_data=f"song_back {stype}|{vidid}",
             ),
             InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"], callback_data=f"close"
+                text="🗑 Close", callback_data=f"close"
             ),
         )
         return await CallbackQuery.edit_message_reply_markup(
@@ -396,8 +394,8 @@ async def song_helper_cb(client, CallbackQuery, _):
 @bot.on_callback_query(
     filters.regex(pattern=r"song_download") & ~BANNED_USERS
 )
-@languageCB
-async def song_download_cb(client, CallbackQuery, _):
+#@languageCB
+async def song_download_cb(client, CallbackQuery):
     try:
         await CallbackQuery.answer("Downloading")
     except:
@@ -405,7 +403,7 @@ async def song_download_cb(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
     stype, format_id, vidid = callback_request.split("|")
-    mystic = await CallbackQuery.edit_message_text(_["song_8"])
+    mystic = await CallbackQuery.edit_message_text("Download Started\n\nDownloading speed could be slow. Please hold on..")
     yturl = f"https://www.youtube.com/watch?v={vidid}"
     with yt_dlp.YoutubeDL({"quiet": True}) as ytdl:
         x = ytdl.extract_info(yturl, download=False)
@@ -426,7 +424,7 @@ async def song_download_cb(client, CallbackQuery, _):
                 title=title,
             )
         except Exception as e:
-            return await mystic.edit_text(_["song_9"].format(e))
+            return await mystic.edit_text("Failed to download song from Youtube-DL\n\n**Reason:** {0}".format(e))
         med = InputMediaVideo(
             media=file_path,
             duration=duration,
@@ -436,7 +434,7 @@ async def song_download_cb(client, CallbackQuery, _):
             caption=title,
             supports_streaming=True,
         )
-        await mystic.edit_text(_["song_11"])
+        await mystic.edit_text("Uploading Started\n\nUploading speed could be slow. Please hold on..")
         await app.send_chat_action(
             chat_id=CallbackQuery.message.chat.id,
             action="upload_video",
@@ -445,7 +443,7 @@ async def song_download_cb(client, CallbackQuery, _):
             await CallbackQuery.edit_message_media(media=med)
         except Exception as e:
             print(e)
-            return await mystic.edit_text(_["song_10"])
+            return await mystic.edit_text("Failed to upload on telegram from servers.")
         os.remove(file_path)
     elif stype == "audio":
         try:
@@ -457,7 +455,7 @@ async def song_download_cb(client, CallbackQuery, _):
                 title=title,
             )
         except Exception as e:
-            return await mystic.edit_text(_["song_9"].format(e))
+            return await mystic.edit_text("Failed to download song from Youtube-DL\n\n**Reason:** {0}".format(e))
         med = InputMediaAudio(
             media=filename,
             caption=title,
@@ -465,7 +463,7 @@ async def song_download_cb(client, CallbackQuery, _):
             title=title,
             performer=x["uploader"],
         )
-        await mystic.edit_text(_["song_11"])
+        await mystic.edit_text("Uploading Started\n\nUploading speed could be slow. Please hold on..")
         await app.send_chat_action(
             chat_id=CallbackQuery.message.chat.id,
             action="upload_audio",
@@ -474,7 +472,7 @@ async def song_download_cb(client, CallbackQuery, _):
             await CallbackQuery.edit_message_media(media=med)
         except Exception as e:
             print(e)
-            return await mystic.edit_text(_["song_10"])
+            return await mystic.edit_text("Failed to upload on telegram from servers.")
         os.remove(filename)
 
 print("I AM ALIVE")
