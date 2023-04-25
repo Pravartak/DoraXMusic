@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import wolverine
 from telegram import Chat, ChatMember, ChatMemberUpdated, Update
 from telegram.ext import (
     Application,
