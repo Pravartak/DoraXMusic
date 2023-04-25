@@ -3,7 +3,6 @@ from typing import Union
 from pyrogram.types import (InlineKeyboardButton, InlineKeyboardMarkup)
 from Adam import bot
 from config import GITHUB_REPO, OWNER_ID
-import callback_data
 
 def private_panel(BOT_USERNAME, OWNER):
     buttons = [
