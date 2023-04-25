@@ -1,6 +1,5 @@
 python-telegram-bot
 pyrogram
-PyYAML
 tgcrypto
 pip==23.0.1
 aiofiles
