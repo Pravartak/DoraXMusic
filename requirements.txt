@@ -12,3 +12,5 @@ yt-dlp
 py-tgcalls
 youtube-search
 youtube-search-python
+ffmpeg
+ffprobe
